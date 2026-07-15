@@ -48,7 +48,7 @@ body{
   overflow-x:hidden;
 }
 
-canvas#ambient{
+canvas#ambient, canvas#ambientFloat{
   position:fixed; inset:0; width:100%; height:100%;
   z-index:0; pointer-events:none;
 }
@@ -294,6 +294,7 @@ footer a:hover{ color:var(--color-bone-white); }
 </head>
 <body>
 
+<canvas id="ambientFloat"></canvas>
 <canvas id="ambient"></canvas>
 
 <nav>
@@ -500,7 +501,7 @@ function makeField(canvas, opts){
         x = Math.random()*w; y = Math.random()*h;
       }
       let scatterX = x, scatterY = y;
-      if(opts.assemble){
+      if(opts.assemble || opts.scrollAssemble){
         const dx = x - w/2, dy = y - h/2;
         const ang = Math.atan2(dy,dx) + (Math.random()-0.5)*1.2;
         const dist = Math.hypot(dx,dy) * (1.8 + Math.random()*1.8) + Math.max(w,h)*0.5;
@@ -602,6 +603,16 @@ function makeField(canvas, opts){
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refresh(); });
   if(!reduceMotion) frame();
 }
+
+// loose ambient layer: small particles drifting freely across the whole screen,
+// independent of the letter — always present, just reacting to the cursor
+makeField(document.getElementById('ambientFloat'), {
+  count: reduceMotion ? 40 : 130,
+  shape: 'scatter',
+  links: false,
+  alpha: 0.35,
+  repel: true, repelRadius: 120, repelStrength: 36,
+});
 
 // single full-page particle field: starts assembled into the letter "T",
 // flies apart as the page scrolls, and always reacts to the cursor
